@@ -29,13 +29,14 @@ be better.
 
 =head1 VERSION
 
-  v.0.0.1
+  v.0.0.2
 
 =head1 AUTHOR
 
 Copyright (C) 2010.
 
 Original version by J.T.Sage (at) gmail (dot) com.
+Modified version by andras.tim (at) gmail (dot) com.
 
 =head1 LICENSE
 
@@ -71,8 +72,6 @@ if ( defined($ARGV[0])) {
 	print "graph_scale yes\n";
 	print "graph_category system\n";
 	print "wired.label wired\nwired.type GAUGE\nwired.draw AREA\n";
-	print "active.label active\nactive.type GAUGE\nactive.draw STACK\n";
-	print "inactive.label inactive\ninactive.type GAUGE\ninactive.draw STACK\n";
 	print "free.label free\nfree.type GAUGE\nfree.draw STACK\n";
 	print "used.label used\nused.type GAUGE\nused.draw LINE2\n";
 	exit 0;
@@ -83,15 +82,11 @@ if ( defined($ARGV[0])) {
 $quit = 0;
 for ( $i = 1;  ($i < $#top and $quit == 0); $i++ ) {
 	if ( $top[$i] =~ /^PhysMem/ ) {
-		$wired = $active = $inactive = $free = $used = $top[$i];
-		$wired =~ s/^.+?: (\d+)M wired.+$/$1/; chomp $wired; $wired = $wired * 1024 * 1024;
-		$active =~ s/^.+?, (\d+)M active.+$/$1/; chomp $active; $active = $active * 1024 * 1024;
-		$inactive =~ s/^.+?, (\d+)M inactive.+$/$1/; chomp $inactive; $inactive = $inactive * 1024 * 1024;
-		$free =~ s/^.+?, (\d+)([M|K]) free.+$/$1/; chomp $free; $free = $free * 1024 * 1024; if ( $2 eq "K" ) { $free = $free / 1024; }
-		$used =~ s/^.+?, (\d+)([M|G]) used.+$/$1/; chomp $used; $used = $used * 1024 * 1024; if ( $2 eq "G" ) { $used = $used * 1024; }
+		$wired = $free = $used = $top[$i];
+		$wired =~ s/^.+?\((\d+)M wired.+$/$1/; chomp $wired; $wired = $wired * 1024 * 1024;
+		$free =~ s/^.+?, (\d+)([M|K]) unused.+$/$1/; chomp $free; $free = $free * 1024 * 1024; if ( $2 eq "K" ) { $free = $free / 1024; }
+		$used =~ s/^.+?: (\d+)([M|G]) used.+$/$1/; chomp $used; $used = $used * 1024 * 1024; if ( $2 eq "G" ) { $used = $used * 1024; }
 		print "wired.value " . $wired . "\n";
-		print "active.value " . $active . "\n";
-		print "inactive.value " . $inactive . "\n";
 		print "free.value " . $free . "\n";
 		print "used.value " . $used . "\n";
 		$quit = 1;
